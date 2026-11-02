@@ -2,9 +2,9 @@ import { useImperativeHandle, useRef } from 'react';
 import { formatClock, TIMELINE } from '../scene/timeline.js';
 
 const WIDTH = 120;
-const HORIZON_Y = 16;
+const HORIZON_Y = 38;
 const MARGIN = 6;
-const toY = (elevation) => HORIZON_Y - elevation * 1.15;
+const toY = (elevation) => HORIZON_Y - elevation * 0.62;
 const toX = (progress) => MARGIN + progress * (WIDTH - MARGIN * 2);
 
 const path = TIMELINE.map(
@@ -38,14 +38,14 @@ export default function SunDial({ ref }) {
       <svg viewBox="0 0 120 44" width="120" height="44">
         <line className="sun-dial__horizon" x1="0" x2={WIDTH} y1={HORIZON_Y} y2={HORIZON_Y} />
         <polyline className="sun-dial__path" points={path} />
-        <circle ref={dot} className="sun-dial__sun" r="3" cx={toX(0)} cy={toY(9)} />
+        <circle ref={dot} className="sun-dial__sun" r="3" cx={toX(0)} cy={toY(TIMELINE[0].sunElevation)} />
       </svg>
       <div className="sun-dial__readout">
         <span ref={time} className="sun-dial__time">
-          17:20
+          {formatClock(TIMELINE[0].minutes)}
         </span>
         <span ref={label} className="sun-dial__label">
-          Sun 9° above horizon
+          Sun {TIMELINE[0].sunElevation}° above horizon
         </span>
       </div>
     </div>

@@ -5,7 +5,7 @@
 export const firm = {
   name: 'Visio Spaces',
   statement: 'We design buildings around the way light moves through a day.',
-  scrollHint: 'Scroll to follow the sun from late afternoon into night',
+  scrollHint: 'Scroll to follow the sun from morning to late afternoon',
 };
 
 export const studio = {

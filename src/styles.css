@@ -1,9 +1,9 @@
 :root {
-  --ink: #131a2a;
-  --dusk: #2a3553;
-  --limestone: #efe9dd;
-  --concrete: #c3c0b8;
-  --lamp: #f6bd6c;
+  --paper: #f3f4f1;
+  --ink: #17223a;
+  --muted: #4c5766;
+  --blueprint: #1f4fa3;
+  --sun: #e0961a;
 
   --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
   --text: 'Newsreader', Georgia, serif;
@@ -11,7 +11,7 @@
   --gutter: clamp(1rem, 3.5vw, 3.5rem);
   --header-height: 4.25rem;
 
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 *,
@@ -28,8 +28,8 @@ html {
 body {
   margin: 0;
   /* Also the fallback when WebGL is unavailable. */
-  background: linear-gradient(180deg, #1b2c4c 0%, #3a3350 12%, #1a2340 45%, #070c1c 100%);
-  color: var(--limestone);
+  background: linear-gradient(180deg, #a9c6dc 0%, #eef1ee 30%, #f3f4f1 100%);
+  color: var(--ink);
   font-family: var(--text);
   font-size: 1.1875rem;
   font-weight: 400;
@@ -61,7 +61,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lamp);
+  outline: 2px solid var(--blueprint);
   outline-offset: 4px;
 }
 
@@ -80,8 +80,8 @@ a {
   left: var(--gutter);
   z-index: 30;
   padding: 0.5rem 1rem;
-  background: var(--limestone);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
   transform: translateY(-200%);
 }
 
@@ -121,7 +121,7 @@ main,
   gap: 1rem;
   height: var(--header-height);
   padding: 0 var(--gutter);
-  background: linear-gradient(180deg, rgb(10 15 28 / 0.6), transparent);
+  background: linear-gradient(180deg, rgb(243 244 241 / 0.85), transparent);
 }
 
 .wordmark {
@@ -150,7 +150,7 @@ main,
 
 .site-header nav a:hover {
   text-decoration: underline;
-  text-decoration-color: var(--lamp);
+  text-decoration-color: var(--blueprint);
 }
 
 /* Hero */
@@ -162,7 +162,7 @@ main,
   align-items: end;
   gap: 0 clamp(1.5rem, 3vw, 3rem);
   padding: 0 var(--gutter) clamp(0.75rem, 2vh, 1.5rem);
-  background: linear-gradient(0deg, rgb(10 14 26 / 0.6), transparent 38%);
+  background: linear-gradient(0deg, rgb(243 244 241 / 0.82), transparent 40%);
   animation: arrive 1.1s 2s both;
 }
 
@@ -193,7 +193,7 @@ main,
 .hero__hint {
   max-width: 24ch;
   margin-top: 0.75rem;
-  color: var(--concrete);
+  color: var(--muted);
   font-size: 1rem;
   font-style: italic;
   line-height: 1.35;
@@ -229,11 +229,11 @@ main,
 }
 
 .chapter--left::before {
-  background: linear-gradient(90deg, rgb(9 13 26 / 0.72), rgb(9 13 26 / 0.34) 38%, transparent 62%);
+  background: linear-gradient(90deg, rgb(243 244 241 / 0.92), rgb(243 244 241 / 0.7) 40%, transparent 62%);
 }
 
 .chapter--right::before {
-  background: linear-gradient(270deg, rgb(9 13 26 / 0.72), rgb(9 13 26 / 0.34) 38%, transparent 62%);
+  background: linear-gradient(270deg, rgb(243 244 241 / 0.92), rgb(243 244 241 / 0.7) 40%, transparent 62%);
 }
 
 .chapter__text {
@@ -264,11 +264,11 @@ main,
   gap: 1rem 2rem;
   margin-top: 2rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgb(239 233 221 / 0.35);
+  border-top: 1px solid rgb(23 34 58 / 0.35);
 }
 
 .project dt {
-  color: var(--concrete);
+  color: var(--muted);
   font-size: 0.9375rem;
   font-style: italic;
 }
@@ -289,7 +289,7 @@ main,
   gap: 0.25rem 1.5rem;
   align-items: baseline;
   padding: 1rem 0;
-  border-top: 1px solid rgb(239 233 221 / 0.25);
+  border-top: 1px solid rgb(23 34 58 / 0.25);
 }
 
 .service-list h3 {
@@ -299,7 +299,7 @@ main,
 }
 
 .service-list p {
-  color: var(--concrete);
+  color: var(--muted);
   font-size: 1.0625rem;
 }
 
@@ -312,13 +312,14 @@ main,
 }
 
 .contact.chapter--right::before {
-  background: linear-gradient(270deg, rgb(9 13 26 / 0.88), rgb(9 13 26 / 0.78) 42%, transparent 68%);
+  background: linear-gradient(270deg, rgb(243 244 241 / 0.95), rgb(243 244 241 / 0.9) 56%, transparent 74%);
+  mask-image: linear-gradient(180deg, transparent, #000 25%);
 }
 
 .contact__email {
   display: inline-block;
   margin-top: 1.5rem;
-  color: var(--lamp);
+  color: var(--blueprint);
   font-family: var(--display);
   font-size: clamp(2rem, 4.2vw, 3.75rem);
   font-weight: 300;
@@ -353,7 +354,7 @@ main,
   align-items: center;
   gap: 0.75rem;
   pointer-events: none;
-  text-shadow: 0 0 12px rgb(9 13 26 / 0.8);
+  text-shadow: 0 0 10px rgb(243 244 241 / 0.9);
 }
 
 .sun-dial svg {
@@ -361,19 +362,19 @@ main,
 }
 
 .sun-dial__horizon {
-  stroke: var(--limestone);
+  stroke: var(--ink);
   stroke-opacity: 0.55;
 }
 
 .sun-dial__path {
   fill: none;
-  stroke: var(--limestone);
+  stroke: var(--ink);
   stroke-opacity: 0.55;
   stroke-dasharray: 2 3;
 }
 
 .sun-dial__sun {
-  fill: var(--lamp);
+  fill: var(--sun);
 }
 
 .sun-dial__readout {
@@ -391,7 +392,7 @@ main,
 }
 
 .sun-dial__label {
-  color: var(--limestone);
+  color: var(--ink);
   font-size: 0.875rem;
   font-style: italic;
 }
@@ -404,9 +405,9 @@ main,
   justify-content: space-between;
   gap: 0.25rem 2rem;
   padding: 1.25rem var(--gutter);
-  color: var(--limestone);
+  color: var(--ink);
   font-size: 0.9375rem;
-  background: rgb(9 13 26 / 0.7);
+  background: rgb(243 244 241 / 0.92);
 }
 
 /* Phones and small tablets: text sits low, the building above it. */
@@ -449,7 +450,7 @@ main,
   .hero {
     grid-template-columns: minmax(0, 1fr);
     align-content: end;
-    background: linear-gradient(0deg, rgb(10 14 26 / 0.8), transparent 55%);
+    background: linear-gradient(0deg, rgb(243 244 241 / 0.92), transparent 58%);
   }
 
   .hero__intro {
@@ -476,7 +477,14 @@ main,
 
   .chapter--left::before,
   .chapter--right::before {
-    background: linear-gradient(0deg, rgb(9 13 26 / 0.86), rgb(9 13 26 / 0.7) 42%, transparent 62%);
+    background: linear-gradient(0deg, rgb(243 244 241 / 0.96), rgb(243 244 241 / 0.9) 50svh, transparent 62svh);
+    mask-image: none;
+  }
+
+  /* These two sections have the tallest text on phones. */
+  #services.chapter--left::before,
+  .contact.chapter--right::before {
+    background: linear-gradient(0deg, rgb(243 244 241 / 0.96), rgb(243 244 241 / 0.92) 78svh, transparent 92svh);
     mask-image: none;
   }
 

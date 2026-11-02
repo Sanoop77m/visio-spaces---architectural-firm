@@ -3,7 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const TEXTURE_METRES = 5;
 
-function seededRandom(seed) {
+export function seededRandom(seed) {
   let value = seed;
   return () => {
     value = (value * 16807) % 2147483647;
@@ -20,10 +20,10 @@ function createConcreteTexture() {
   const random = seededRandom(11);
   const planks = 16;
   for (let i = 0; i < planks; i++) {
-    const shade = 176 + random() * 26;
+    const shade = 214 + random() * 24;
     ctx.fillStyle = `rgb(${shade},${shade - 3},${shade - 9})`;
     ctx.fillRect(0, (i * size) / planks, size, size / planks);
-    ctx.fillStyle = 'rgba(30,30,34,0.35)';
+    ctx.fillStyle = 'rgba(30,30,34,0.16)';
     ctx.fillRect(0, (i * size) / planks, size, 1.5);
   }
   for (let i = 0; i < 9000; i++) {
@@ -69,9 +69,9 @@ export function createMaterials() {
     });
   const glass = (seed) =>
     new THREE.MeshStandardMaterial({
-      color: '#10161f',
-      roughness: 0.5,
-      metalness: 0.15,
+      color: '#54707f',
+      roughness: 0.25,
+      metalness: 0.1,
       emissive: '#ffb066',
       emissiveMap: createWindowTexture(seed),
       emissiveIntensity: 0,
@@ -84,12 +84,11 @@ export function createMaterials() {
     glass: glass(29),
     glassLate: glass(53),
     slit: new THREE.MeshStandardMaterial({
-      color: '#10161f',
+      color: '#2d3b48',
       emissive: '#ffc27a',
       emissiveIntensity: 0,
     }),
-    water: new THREE.MeshStandardMaterial({ color: '#1a2436', roughness: 0.08, metalness: 0.9 }),
-    tree: new THREE.MeshStandardMaterial({ color: '#34493b', roughness: 1 }),
+    water: new THREE.MeshStandardMaterial({ color: '#7fa6ba', roughness: 0.15, metalness: 0.1 }),
   };
 }
 
@@ -139,14 +138,7 @@ function createBuilder(parent, materials, edges) {
   return { add, box };
 }
 
-function addLight(group, x, y, z, lights) {
-  const light = new THREE.PointLight('#ffb36b', 0, 42, 1.8);
-  light.position.set(x, y, z);
-  group.add(light);
-  lights.push(light);
-}
-
-function buildHouse(group, materials, lights, edges) {
+function buildHouse(group, materials, edges) {
   const { box } = createBuilder(group, materials, edges);
   const { concrete, darkConcrete, glass, glassLate, bronze, water } = materials;
 
@@ -175,11 +167,9 @@ function buildHouse(group, materials, lights, edges) {
   box(0.4, 1.4, 10, -16, 0.4, 7);
   for (let i = 0; i < 4; i++) box(4, 0.1 + i * 0.1, 0.6, 14, 0, 13.4 - i * 0.6, darkConcrete);
   box(12, 0.06, 4.5, 3, 0.4, 9.2, water);
-
-  addLight(group, 3, 3, 9, lights);
 }
 
-function buildLibrary(group, materials, lights) {
+function buildLibrary(group, materials) {
   const { add, box } = createBuilder(group, materials);
   const { concrete, darkConcrete, glass, glassLate, bronze } = materials;
   const bays = 7;
@@ -215,11 +205,9 @@ function buildLibrary(group, materials, lights) {
   }
   box(width + 1, 0.4, 3.4, 0, height - 0.7, depth / 2 + 1.6);
   for (let i = 0; i < 5; i++) box(5, 0.45, 0.6, -14 + i * 7, 0.5, depth / 2 + 6, bronze);
-
-  addLight(group, 0, 3, depth / 2 + 5, lights);
 }
 
-function buildOffices(group, materials, lights) {
+function buildOffices(group, materials) {
   const { box } = createBuilder(group, materials);
   const { concrete, darkConcrete, glass, glassLate, bronze } = materials;
   const floors = 9;
@@ -236,11 +224,9 @@ function buildOffices(group, materials, lights) {
     box(17, storey - 0.45, 12, x, y, z, i % 3 === 1 ? glassLate : glass);
     box(20, 0.75, 0.16, x, y + storey, z + 7.45, bronze);
   }
-
-  addLight(group, 0, 4, 14, lights);
 }
 
-function buildPavilion(group, materials, lights) {
+function buildPavilion(group, materials) {
   const { add, box } = createBuilder(group, materials);
   const { concrete, darkConcrete, slit, water } = materials;
 
@@ -264,8 +250,6 @@ function buildPavilion(group, materials, lights) {
   box(2.8, 2.6, 0.2, 3.5, 0.4, 5.05, slit);
   box(16, 2, 0.4, -11, 0.4, 10);
   box(11, 0.06, 8, 7, 0.4, 9.5, water);
-
-  addLight(group, -3.2, 4, 8, lights);
 }
 
 // Metres. Each model faces +z so the camera stops read from the south.
@@ -301,94 +285,13 @@ function mergeByMaterial(group, materials) {
 }
 
 export function createBuildings(scene, materials) {
-  const lights = [];
   const heroEdges = [];
   SITES.forEach((site, index) => {
     const group = new THREE.Group();
     group.position.set(...site.position);
     scene.add(group);
-    site.build(group, materials, lights, index === 0 ? heroEdges : undefined);
+    site.build(group, materials, index === 0 ? heroEdges : undefined);
     mergeByMaterial(group, materials);
   });
-  return { lights, heroEdges };
-}
-
-export function createTrees(scene, material, avoidPoints) {
-  const random = seededRandom(73);
-  const dummy = new THREE.Object3D();
-  const placements = [];
-  for (let attempt = 0; attempt < 900 && placements.length < 170; attempt++) {
-    const x = -170 + random() * 340;
-    const z = -210 + random() * 310;
-    const clearOfBuildings = SITES.every(
-      ({ position, radius }) => Math.hypot(x - position[0], z - position[2]) > radius,
-    );
-    const clearOfCamera = avoidPoints.every((point) => Math.hypot(x - point.x, z - point.z) > 24);
-    if (clearOfBuildings && clearOfCamera) placements.push([x, z, 1 + random() * 1.3]);
-  }
-
-  // Slim cypress forms, like the trees on an architect's site model.
-  const crown = new THREE.IcosahedronGeometry(1, 3);
-  const crownPositions = crown.attributes.position;
-  for (let i = 0; i < crownPositions.count; i++) {
-    const taper = 1 - 0.5 * ((crownPositions.getY(i) + 1) / 2);
-    crownPositions.setX(i, crownPositions.getX(i) * taper);
-    crownPositions.setZ(i, crownPositions.getZ(i) * taper);
-  }
-  crown.computeVertexNormals();
-  const mesh = new THREE.InstancedMesh(crown, material, placements.length);
-  placements.forEach(([x, z, size], index) => {
-    dummy.position.set(x, size * 3.4, z);
-    dummy.scale.set(size, size * 3.4, size);
-    dummy.updateMatrix();
-    mesh.setMatrixAt(index, dummy.matrix);
-  });
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  scene.add(mesh);
-}
-
-// Dark site plan with faint survey contours.
-export function createGround(scene) {
-  const size = 1024;
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = size;
-  const ctx = canvas.getContext('2d');
-  const image = ctx.createImageData(size, size);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const u = x / size;
-      const v = y / size;
-      const height =
-        Math.sin(u * 7.1 + Math.sin(v * 4.3) * 1.4) +
-        Math.sin(v * 6.2 + Math.cos(u * 5.2) * 1.2) * 0.8 +
-        Math.sin((u + v) * 13) * 0.18;
-      const band = Math.abs((((height * 5) % 1) + 1) % 1 - 0.5);
-      const line = band < 0.035 ? 1 : 0;
-      const i = (y * size + x) * 4;
-      image.data[i] = 96 + line * 30;
-      image.data[i + 1] = 98 + line * 30;
-      image.data[i + 2] = 100 + line * 32;
-      image.data[i + 3] = 255;
-    }
-  }
-  ctx.putImageData(image, 0, 0);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 16;
-  const ground = new THREE.Mesh(
-    new THREE.CircleGeometry(900, 64),
-    new THREE.MeshStandardMaterial({ map: texture, roughness: 0.97 }),
-  );
-  ground.rotation.x = -Math.PI / 2;
-  ground.receiveShadow = true;
-  scene.add(ground);
-
-  // The contour texture only spans the site itself.
-  const uv = ground.geometry.attributes.uv;
-  for (let i = 0; i < uv.count; i++) {
-    uv.setXY(i, (uv.getX(i) - 0.5) * 3 + 0.5, (uv.getY(i) - 0.5) * 3 + 0.5);
-  }
-  texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
+  return { heroEdges };
 }
