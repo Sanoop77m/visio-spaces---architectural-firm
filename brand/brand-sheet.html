@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visio Spaces brand sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap"
+    />
+    <link rel="stylesheet" href="tokens.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--vs-surface);
+        color: var(--vs-text);
+        font-family: var(--vs-font);
+        font-size: var(--vs-text-base);
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 76rem;
+        margin: 0 auto;
+        padding: clamp(1rem, 4vw, 3.5rem);
+      }
+
+      section {
+        padding-block: clamp(2.5rem, 6vw, 4.5rem);
+        border-top: 1px solid var(--vs-border);
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-stretch: var(--vs-width-display);
+        font-weight: 400;
+      }
+
+      h1 {
+        font-size: var(--vs-text-display);
+        line-height: 1;
+        letter-spacing: -0.01em;
+      }
+
+      h2 {
+        margin-bottom: 1.5rem;
+        font-size: var(--vs-text-xl);
+        line-height: 1.1;
+        letter-spacing: -0.005em;
+      }
+
+      p {
+        max-width: 62ch;
+        margin: 0 0 1rem;
+      }
+
+      .lead {
+        font-size: var(--vs-text-md);
+        line-height: 1.45;
+      }
+
+      .muted {
+        color: var(--vs-text-muted);
+        font-size: var(--vs-text-sm);
+      }
+
+      header {
+        padding-block: clamp(1rem, 4vw, 3rem) clamp(2.5rem, 6vw, 4.5rem);
+      }
+
+      .cover-logo {
+        display: block;
+        width: 11rem;
+        height: auto;
+        margin-bottom: clamp(2.5rem, 6vw, 4.5rem);
+      }
+
+      .logo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+        gap: 1rem;
+      }
+
+      .logo-tile {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        background: var(--vs-white);
+      }
+
+      .logo-tile img {
+        position: absolute;
+        inset: 14%;
+        width: 72%;
+        height: 72%;
+        object-fit: contain;
+      }
+
+      .logo-tile--paper {
+        background: var(--vs-stone-100);
+      }
+
+      .logo-tile--dark {
+        background: var(--vs-graphite);
+      }
+
+      .logo-tile--blue {
+        background: var(--vs-blueprint-900);
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .swatch {
+        font-size: var(--vs-text-sm);
+        line-height: 1.35;
+      }
+
+      .swatch span {
+        display: block;
+        height: 5.5rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--vs-border);
+      }
+
+      .swatch b {
+        display: block;
+        font-weight: 500;
+      }
+
+      .type-row {
+        display: grid;
+        grid-template-columns: 7rem minmax(0, 1fr);
+        gap: 1rem;
+        align-items: baseline;
+        padding-block: 1rem;
+        border-top: 1px solid var(--vs-border);
+      }
+
+      .sample {
+        overflow-wrap: anywhere;
+      }
+
+      .idea {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+        gap: 2rem;
+        align-items: center;
+      }
+
+      .built-drawn {
+        display: block;
+        width: 100%;
+        max-width: 26rem;
+        height: auto;
+      }
+
+      .on-dark-demo {
+        padding: clamp(1.5rem, 4vw, 3rem);
+        background: var(--vs-surface);
+        color: var(--vs-text);
+      }
+
+      a {
+        color: var(--vs-link);
+      }
+
+      a:hover {
+        color: var(--vs-link-hover);
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--vs-focus);
+        outline-offset: 3px;
+      }
+
+      @page {
+        size: A4;
+        margin: 14mm;
+      }
+
+      @media print {
+        * {
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+
+        body {
+          background: var(--vs-white);
+          font-size: 11pt;
+        }
+
+        main {
+          max-width: none;
+          padding: 0;
+        }
+
+        h1 {
+          font-size: 54pt;
+        }
+
+        h2 {
+          font-size: 24pt;
+        }
+
+        header {
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          height: 262mm;
+          padding: 0;
+        }
+
+        .cover-logo {
+          width: 70mm;
+          margin-bottom: auto;
+        }
+
+        .screen-only {
+          display: none;
+        }
+
+        section {
+          padding-block: 0;
+          border-top: 0;
+          break-before: page;
+        }
+
+        .logo-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .swatches {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .swatch,
+        .type-row,
+        .logo-tile,
+        .on-dark-demo {
+          break-inside: avoid;
+        }
+
+        .type-row .sample[style*='--vs-text-display'] {
+          font-size: 54pt !important;
+        }
+
+        .on-dark-demo {
+          break-before: auto;
+          margin-top: 12mm;
+        }
+
+        .idea {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 34rem) {
+        .type-row {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 0.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <img class="cover-logo" src="logo/visio-spaces-logo-graphite.svg" alt="Visio Spaces, Architectural Consultancy" />
+        <h1>Built and drawn</h1>
+        <p class="lead" style="margin-top: 1.5rem">
+          The Visio Spaces brand, derived from its logo. Solid where it's decided. Line where it's
+          still being imagined.
+        </p>
+        <p class="muted">
+          Version 0.1. The logo and Graphite are the firm's own; everything else is a proposal
+          awaiting approval. Full rules are in BRAND.md.
+        </p>
+      </header>
+
+      <section>
+        <h2>Logo</h2>
+        <div class="logo-grid">
+          <div class="logo-tile">
+            <img src="logo/visio-spaces-logo-graphite.svg" alt="Visio Spaces logo in Graphite on white" />
+          </div>
+          <div class="logo-tile logo-tile--paper">
+            <img src="logo/visio-spaces-mark-graphite.svg" alt="Visio Spaces mark in Graphite on stone" />
+          </div>
+          <div class="logo-tile logo-tile--dark">
+            <img src="logo/visio-spaces-logo-white.svg" alt="Visio Spaces logo in white on Graphite" />
+          </div>
+          <div class="logo-tile logo-tile--blue">
+            <img src="logo/visio-spaces-mark-white.svg" alt="Visio Spaces mark in white on deep Blueprint" />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Colour</h2>
+        <div class="swatches" id="core"></div>
+        <div class="swatches" id="stone"></div>
+        <div class="swatches" id="blueprint"></div>
+      </section>
+
+      <section>
+        <h2>Type</h2>
+        <p>Archivo throughout. Headings widen to echo the logo; body text stays at normal width.</p>
+        <div class="type-row">
+          <span class="muted">Display, 125%</span>
+          <div class="sample" style="font-size: var(--vs-text-display); font-stretch: 125%; line-height: 1; letter-spacing: -0.01em">
+            Light first
+          </div>
+        </div>
+        <div class="type-row">
+          <span class="muted">2xl, 125%</span>
+          <div class="sample" style="font-size: var(--vs-text-2xl); font-stretch: 125%; line-height: 1.05; letter-spacing: -0.01em">
+            Courtyard House
+          </div>
+        </div>
+        <div class="type-row">
+          <span class="muted">xl, 125%</span>
+          <div class="sample" style="font-size: var(--vs-text-xl); font-stretch: 125%; line-height: 1.1">
+            Tell us about your site
+          </div>
+        </div>
+        <div class="type-row">
+          <span class="muted">lg, 112%</span>
+          <div class="sample" style="font-size: var(--vs-text-lg); font-stretch: 112%; font-weight: 500; line-height: 1.2">
+            Daylight studies
+          </div>
+        </div>
+        <div class="type-row">
+          <span class="muted">md, lead</span>
+          <p class="sample lead">The bedrooms face east for morning light, and the living room stays cool through the afternoon.</p>
+        </div>
+        <div class="type-row">
+          <span class="muted">base, body</span>
+          <p class="sample">
+            Before we draw a wall, we spend a day on the site and record where the light falls, hour
+            by hour. Rooms, openings and shade are placed from those notes.
+          </p>
+        </div>
+        <div class="type-row">
+          <span class="muted">sm, label</span>
+          <div class="sample" style="font-size: var(--vs-text-sm); font-weight: 500; letter-spacing: 0.005em">Location: Kochi, India</div>
+        </div>
+      </section>
+
+      <section class="idea">
+        <div>
+          <h2>Solid and line</h2>
+          <p>
+            Pair a heavy, filled form with a fine outline, with little in between. Keep corners
+            square, and keep any diagonal close to the mark's angle of about 36°.
+          </p>
+          <p class="screen-only"><a href="BRAND.md">Read the full guidelines</a></p>
+        </div>
+        <svg class="built-drawn" viewBox="0 0 400 240" role="img" aria-label="A solid sloped block beside the same form drawn as a thin outline">
+          <path fill="#1f1f1f" d="M20 230V88L180 20v210z" />
+          <path fill="none" stroke="#1f4fa3" stroke-width="3" d="M220 230V88L380 20v210z" />
+        </svg>
+      </section>
+
+      <section class="on-dark-demo vs-on-dark">
+        <h2>On Graphite</h2>
+        <p class="lead">Text stays calm on dark surfaces, and <a href="#">links turn pale blue</a>.</p>
+        <p style="color: var(--vs-text-muted)">Secondary text uses Stone 300.</p>
+      </section>
+    </main>
+
+    <script>
+      const groups = {
+        core: [['Graphite', '#1F1F1F'], ['White', '#FFFFFF'], ['Paper', '#F6F5F2']],
+        stone: [['Stone 100', '#ECEAE5'], ['Stone 200', '#DAD7D0'], ['Stone 300', '#BDB9B0'], ['Stone 400', '#98948B'], ['Stone 500', '#76726A'], ['Stone 600', '#5C5952'], ['Stone 700', '#45433E'], ['Stone 800', '#31302C']],
+        blueprint: [['Blueprint 100', '#E3EAF6'], ['Blueprint 300', '#8FAADB'], ['Blueprint 500', '#2F62BC'], ['Blueprint 600', '#1F4FA3'], ['Blueprint 700', '#193F83'], ['Blueprint 900', '#102850']],
+      };
+      Object.entries(groups).forEach(([id, swatches]) => {
+        document.getElementById(id).innerHTML = swatches
+          .map(([name, hex]) => `<div class="swatch"><span style="background:${hex}"></span><b>${name}</b>${hex}</div>`)
+          .join('');
+      });
+    </script>
+  </body>
+</html>

@@ -2,13 +2,13 @@ import { useCallback, useRef } from 'react';
 import { contact, firm, footer, projects, services, studio } from './data/content.js';
 import SiteCanvas from './components/SiteCanvas.jsx';
 import SunDial from './components/SunDial.jsx';
+import logoMark from '../brand/logo/visio-spaces-mark-graphite.svg';
 
 function Header() {
   return (
     <header className="site-header">
-      <a className="wordmark" href="#top">
-        <img src="/mark.svg" alt="" width="22" height="22" />
-        {firm.name}
+      <a className="site-logo" href="#top">
+        <img src={logoMark} alt={`${firm.name} home`} />
       </a>
       <nav aria-label="Main">
         <a href="#projects">Projects</a>
@@ -54,11 +54,22 @@ export default function App() {
 
       <main id="main">
         <section className="hero" id="top" data-stop="hero">
-          <div className="hero__intro">
-            <p className="hero__statement">{firm.statement}</p>
-            <p className="hero__hint">{firm.scrollHint}</p>
+          <div className="hero__text">
+            <h1 aria-label={firm.name}>
+              {[...firm.name].map((letter, index) => (
+                <span key={index} aria-hidden="true" style={{ '--letter': index }}>
+                  {letter === ' ' ? ' ' : letter}
+                </span>
+              ))}
+            </h1>
+            <div className="hero__intro">
+              <div>
+                <p className="hero__descriptor">{firm.descriptor}</p>
+                <p className="hero__statement">{firm.statement}</p>
+              </div>
+              <p className="hero__hint">{firm.scrollHint}</p>
+            </div>
           </div>
-          <h1>{firm.name}</h1>
         </section>
 
         <section className="chapter chapter--right" id="studio" data-stop="studio">

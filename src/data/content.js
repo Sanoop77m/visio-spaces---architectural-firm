@@ -4,6 +4,8 @@
 
 export const firm = {
   name: 'Visio Spaces',
+  // From the firm's logo, so this line is real, unlike the rest of this file.
+  descriptor: 'Architectural Consultancy',
   statement: 'We design buildings around the way light moves through a day.',
   scrollHint: 'Scroll to follow the sun from morning to late afternoon',
 };

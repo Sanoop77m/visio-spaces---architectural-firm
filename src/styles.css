@@ -1,15 +1,9 @@
+/* Colours, type sizes and logo rules come from brand/tokens.css. See brand/BRAND.md. */
 :root {
-  --paper: #f3f4f1;
-  --ink: #17223a;
-  --muted: #4c5766;
-  --blueprint: #1f4fa3;
-  --sun: #e0961a;
-
-  --display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
-  --text: 'Newsreader', Georgia, serif;
-
   --gutter: clamp(1rem, 3.5vw, 3.5rem);
-  --header-height: 4.25rem;
+  --header-height: 4.75rem;
+  --shade: 246 245 242;
+  --rule: 31 31 31;
 
   color-scheme: light;
 }
@@ -28,10 +22,10 @@ html {
 body {
   margin: 0;
   /* Also the fallback when WebGL is unavailable. */
-  background: linear-gradient(180deg, #a9c6dc 0%, #eef1ee 30%, #f3f4f1 100%);
-  color: var(--ink);
-  font-family: var(--text);
-  font-size: 1.1875rem;
+  background: linear-gradient(180deg, #a9c6dc 0%, #eef1ee 30%, var(--vs-paper) 100%);
+  color: var(--vs-text);
+  font-family: var(--vs-font);
+  font-size: var(--vs-text-base);
   font-weight: 400;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -52,8 +46,8 @@ ul {
 h1,
 h2,
 h3 {
-  font-family: var(--display);
-  font-weight: 300;
+  font-stretch: var(--vs-width-display);
+  font-weight: 400;
 }
 
 a {
@@ -61,7 +55,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--blueprint);
+  outline: 2px solid var(--vs-focus);
   outline-offset: 4px;
 }
 
@@ -80,8 +74,8 @@ a {
   left: var(--gutter);
   z-index: 30;
   padding: 0.5rem 1rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--vs-graphite);
+  color: var(--vs-paper);
   transform: translateY(-200%);
 }
 
@@ -121,25 +115,27 @@ main,
   gap: 1rem;
   height: var(--header-height);
   padding: 0 var(--gutter);
-  background: linear-gradient(180deg, rgb(243 244 241 / 0.85), transparent);
+  background: linear-gradient(180deg, rgb(var(--shade) / 0.9), transparent);
 }
 
-.wordmark {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-family: var(--display);
-  font-size: 1.5rem;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  white-space: nowrap;
+.site-logo {
+  display: block;
+  flex: none;
+}
+
+/* The brand's minimum size for the mark alone is 40 px tall. */
+.site-logo img {
+  display: block;
+  width: auto;
+  height: max(var(--vs-mark-min-height), 2.75rem);
 }
 
 .site-header nav {
   display: flex;
   gap: clamp(0.9rem, 2.4vw, 2.25rem);
-  font-size: 1.0625rem;
+  font-size: var(--vs-text-sm);
+  font-weight: 500;
+  letter-spacing: 0.005em;
 }
 
 .site-header nav a {
@@ -149,54 +145,118 @@ main,
 }
 
 .site-header nav a:hover {
+  color: var(--vs-link);
   text-decoration: underline;
-  text-decoration-color: var(--blueprint);
 }
 
 /* Hero */
 
 .hero {
+  position: relative;
   min-height: 100svh;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: end;
-  gap: 0 clamp(1.5rem, 3vw, 3rem);
-  padding: 0 var(--gutter) clamp(0.75rem, 2vh, 1.5rem);
-  background: linear-gradient(0deg, rgb(243 244 241 / 0.82), transparent 40%);
-  animation: arrive 1.1s 2s both;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 var(--gutter) clamp(1rem, 3vh, 2rem);
+  isolation: isolate;
 }
 
-.hero h1 {
-  grid-column: 1;
-  grid-row: 1;
-  margin-inline: -0.03em;
-  font-size: min(22vw, 42vh);
-  font-weight: 200;
-  line-height: 1.12;
-  letter-spacing: -0.005em;
-  white-space: nowrap;
+/* One gradient that runs on past the hero, so no edge shows when the page scrolls. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 135svh;
+  background: linear-gradient(
+    180deg,
+    transparent 54svh,
+    rgb(var(--shade) / 0.86) 76svh,
+    rgb(var(--shade) / 0.94) 100svh,
+    transparent 135svh
+  );
+  pointer-events: none;
+}
+
+/* The text and its shade leave before the text reaches the fixed menu and sun
+   dial, so the scene is clear from then on. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__text,
+    .hero::before {
+      animation: hero-leave linear both;
+      animation-timeline: scroll();
+      animation-range: 8svh 40svh;
+    }
+  }
+}
+
+@keyframes hero-leave {
+  to {
+    opacity: 0;
+  }
 }
 
 .hero__intro {
-  grid-column: 2;
-  grid-row: 1;
-  padding-bottom: clamp(1rem, 3.2vh, 2.5rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem 3rem;
+  margin-top: clamp(0.25rem, 1vh, 0.75rem);
+  animation: arrive 1s 2.3s both;
+}
+
+.hero__descriptor {
+  margin-bottom: 0.4rem;
+  font-size: var(--vs-text-sm);
+  font-weight: 500;
+  letter-spacing: 0.005em;
 }
 
 .hero__statement {
-  max-width: 21ch;
-  font-size: clamp(1.25rem, 1.9vw, 2rem);
-  font-weight: 300;
-  line-height: 1.22;
+  max-width: 26ch;
+  font-size: clamp(var(--vs-text-md), 2.1vw, 1.875rem);
+  line-height: 1.25;
 }
 
 .hero__hint {
-  max-width: 24ch;
-  margin-top: 0.75rem;
-  color: var(--muted);
-  font-size: 1rem;
-  font-style: italic;
-  line-height: 1.35;
+  flex: none;
+  max-width: 26ch;
+  color: var(--vs-text-muted);
+  font-size: var(--vs-text-sm);
+  line-height: 1.4;
+  text-align: right;
+}
+
+.hero h1 {
+  margin-inline: -0.04em;
+  font-size: min(12.4vw, 34vh);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* The name is drawn in blueprint line, then turns solid along with the house. */
+.hero h1 span {
+  display: inline-block;
+  -webkit-text-stroke: 1.5px transparent;
+  animation:
+    letter-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) calc(0.2s + var(--letter) * 55ms) both,
+    letter-fill 1s ease calc(1.4s + var(--letter) * 55ms) both;
+}
+
+@keyframes letter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.16em);
+  }
+}
+
+@keyframes letter-fill {
+  from {
+    color: transparent;
+    -webkit-text-stroke-color: var(--vs-blueprint-600);
+  }
 }
 
 @keyframes arrive {
@@ -229,27 +289,34 @@ main,
 }
 
 .chapter--left::before {
-  background: linear-gradient(90deg, rgb(243 244 241 / 0.92), rgb(243 244 241 / 0.7) 40%, transparent 62%);
+  background: linear-gradient(90deg, rgb(var(--shade) / 0.94), rgb(var(--shade) / 0.76) 44%, transparent 66%);
 }
 
 .chapter--right::before {
-  background: linear-gradient(270deg, rgb(243 244 241 / 0.92), rgb(243 244 241 / 0.7) 40%, transparent 62%);
+  background: linear-gradient(270deg, rgb(var(--shade) / 0.94), rgb(var(--shade) / 0.76) 44%, transparent 66%);
 }
 
 .chapter__text {
   position: relative;
-  width: min(100%, 31rem);
+  width: min(100%, 34rem);
 }
 
 .chapter__text--wide {
-  width: min(100%, 40rem);
+  width: min(100%, 42rem);
 }
 
 .chapter h2,
 .project h3 {
-  margin-bottom: 1.5rem;
-  font-size: clamp(3.75rem, 7.5vw, 7.5rem);
-  line-height: 0.95;
+  margin-bottom: 1.25rem;
+  font-size: clamp(var(--vs-text-xl), 4.2vw, var(--vs-text-2xl));
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.chapter__text > p {
+  max-width: 62ch;
+  font-size: var(--vs-text-md);
+  line-height: 1.45;
 }
 
 .chapter__text > p + p {
@@ -264,17 +331,18 @@ main,
   gap: 1rem 2rem;
   margin-top: 2rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgb(23 34 58 / 0.35);
+  border-top: 1px solid rgb(var(--rule) / 0.35);
 }
 
 .project dt {
-  color: var(--muted);
-  font-size: 0.9375rem;
-  font-style: italic;
+  color: var(--vs-text-muted);
+  font-size: var(--vs-text-xs);
+  letter-spacing: 0.005em;
+  line-height: 1.4;
 }
 
 .project dd {
-  font-size: 1.125rem;
+  font-weight: 500;
 }
 
 /* Services */
@@ -285,22 +353,24 @@ main,
 
 .service-list li {
   display: grid;
-  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
   gap: 0.25rem 1.5rem;
   align-items: baseline;
   padding: 1rem 0;
-  border-top: 1px solid rgb(23 34 58 / 0.25);
+  border-top: 1px solid rgb(var(--rule) / 0.25);
 }
 
-.service-list h3 {
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 1.1;
+.chapter__text .service-list h3 {
+  margin: 0;
+  font-size: var(--vs-text-lg);
+  font-stretch: var(--vs-width-subheading);
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.2;
 }
 
 .service-list p {
-  color: var(--muted);
-  font-size: 1.0625rem;
+  color: var(--vs-text-muted);
 }
 
 /* Contact */
@@ -312,21 +382,24 @@ main,
 }
 
 .contact.chapter--right::before {
-  background: linear-gradient(270deg, rgb(243 244 241 / 0.95), rgb(243 244 241 / 0.9) 56%, transparent 74%);
+  background: linear-gradient(270deg, rgb(var(--shade) / 0.96), rgb(var(--shade) / 0.92) 58%, transparent 76%);
   mask-image: linear-gradient(180deg, transparent, #000 25%);
 }
 
 .contact__email {
   display: inline-block;
   margin-top: 1.5rem;
-  color: var(--blueprint);
-  font-family: var(--display);
-  font-size: clamp(2rem, 4.2vw, 3.75rem);
-  font-weight: 300;
-  line-height: 1.1;
+  color: var(--vs-link);
+  font-size: clamp(var(--vs-text-lg), 2.9vw, var(--vs-text-xl));
+  font-stretch: var(--vs-width-subheading);
+  line-height: 1.15;
   overflow-wrap: anywhere;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
+}
+
+.contact__email:hover {
+  color: var(--vs-link-hover);
 }
 
 .contact__details {
@@ -334,7 +407,6 @@ main,
   flex-wrap: wrap;
   gap: 1rem 3rem;
   margin-top: 2rem;
-  font-size: 1.0625rem;
 }
 
 .contact__details address {
@@ -348,13 +420,13 @@ main,
 .sun-dial {
   position: fixed;
   right: var(--gutter);
-  top: calc(var(--header-height) + 0.5rem);
+  top: calc(var(--header-height) + 0.25rem);
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   pointer-events: none;
-  text-shadow: 0 0 10px rgb(243 244 241 / 0.9);
+  text-shadow: 0 0 10px rgb(var(--shade) / 0.9);
 }
 
 .sun-dial svg {
@@ -362,19 +434,19 @@ main,
 }
 
 .sun-dial__horizon {
-  stroke: var(--ink);
-  stroke-opacity: 0.55;
+  stroke: var(--vs-graphite);
+  stroke-opacity: 0.6;
 }
 
 .sun-dial__path {
   fill: none;
-  stroke: var(--ink);
-  stroke-opacity: 0.55;
+  stroke: var(--vs-graphite);
+  stroke-opacity: 0.6;
   stroke-dasharray: 2 3;
 }
 
 .sun-dial__sun {
-  fill: var(--sun);
+  fill: var(--vs-blueprint-600);
 }
 
 .sun-dial__readout {
@@ -385,16 +457,15 @@ main,
 }
 
 .sun-dial__time {
-  font-family: var(--display);
-  font-size: 1.625rem;
+  font-size: var(--vs-text-lg);
+  font-stretch: var(--vs-width-subheading);
   font-variant-numeric: tabular-nums;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .sun-dial__label {
-  color: var(--ink);
-  font-size: 0.875rem;
-  font-style: italic;
+  font-size: var(--vs-text-xs);
+  letter-spacing: 0.005em;
 }
 
 /* Footer */
@@ -405,37 +476,24 @@ main,
   justify-content: space-between;
   gap: 0.25rem 2rem;
   padding: 1.25rem var(--gutter);
-  color: var(--ink);
-  font-size: 0.9375rem;
-  background: rgb(243 244 241 / 0.92);
+  font-size: var(--vs-text-sm);
+  background: rgb(var(--shade) / 0.94);
 }
 
 /* Phones and small tablets: text sits low, the building above it. */
 
 @media (max-width: 799px) {
-  body {
-    font-size: 1.125rem;
-  }
-
-  .site-header {
-    --header-height: 3.5rem;
-  }
-
-  .wordmark {
-    font-size: 1.25rem;
-  }
-
-  .wordmark img {
-    display: none;
+  :root {
+    --header-height: 4rem;
   }
 
   .site-header nav {
     gap: 0.8rem;
-    font-size: 0.9375rem;
+    font-size: 0.8125rem;
   }
 
   .sun-dial {
-    top: calc(var(--header-height) - 0.25rem);
+    top: var(--header-height);
   }
 
   .sun-dial svg {
@@ -447,22 +505,23 @@ main,
     display: none;
   }
 
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    align-content: end;
-    background: linear-gradient(0deg, rgb(243 244 241 / 0.92), transparent 58%);
+  .hero::before {
+    background: linear-gradient(
+      180deg,
+      transparent 54svh,
+      rgb(var(--shade) / 0.9) 70svh,
+      rgb(var(--shade) / 0.97) 100svh,
+      transparent 135svh
+    );
   }
 
   .hero__intro {
-    grid-column: 1;
-    grid-row: 1;
-    padding-bottom: 0;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .hero h1 {
-    grid-column: 1;
-    grid-row: 2;
-    font-size: 29vw;
+  .hero__hint {
+    text-align: left;
   }
 
   .chapter {
@@ -477,14 +536,14 @@ main,
 
   .chapter--left::before,
   .chapter--right::before {
-    background: linear-gradient(0deg, rgb(243 244 241 / 0.96), rgb(243 244 241 / 0.9) 50svh, transparent 62svh);
+    background: linear-gradient(0deg, rgb(var(--shade) / 0.97), rgb(var(--shade) / 0.92) 52svh, transparent 64svh);
     mask-image: none;
   }
 
   /* These two sections have the tallest text on phones. */
   #services.chapter--left::before,
   .contact.chapter--right::before {
-    background: linear-gradient(0deg, rgb(243 244 241 / 0.96), rgb(243 244 241 / 0.92) 78svh, transparent 92svh);
+    background: linear-gradient(0deg, rgb(var(--shade) / 0.97), rgb(var(--shade) / 0.94) 78svh, transparent 92svh);
     mask-image: none;
   }
 
@@ -503,7 +562,8 @@ main,
     scroll-behavior: auto;
   }
 
-  .hero {
+  .hero__intro,
+  .hero h1 span {
     animation: none;
   }
 }

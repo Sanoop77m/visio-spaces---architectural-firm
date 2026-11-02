@@ -1,0 +1,71 @@
+/* Visio Spaces brand tokens. See BRAND.md for how to use them. */
+:root {
+  /* Core */
+  --vs-graphite: #1f1f1f;
+  --vs-white: #ffffff;
+  --vs-paper: #f6f5f2;
+
+  /* Stone neutrals */
+  --vs-stone-100: #eceae5;
+  --vs-stone-200: #dad7d0;
+  --vs-stone-300: #bdb9b0;
+  --vs-stone-400: #98948b;
+  --vs-stone-500: #76726a;
+  --vs-stone-600: #5c5952;
+  --vs-stone-700: #45433e;
+  --vs-stone-800: #31302c;
+
+  /* Blueprint accent */
+  --vs-blueprint-100: #e3eaf6;
+  --vs-blueprint-300: #8faadb;
+  --vs-blueprint-500: #2f62bc;
+  --vs-blueprint-600: #1f4fa3;
+  --vs-blueprint-700: #193f83;
+  --vs-blueprint-900: #102850;
+
+  /* Status, for forms only */
+  --vs-success: #1e6b4a;
+  --vs-warning: #8a5a00;
+  --vs-error: #b3261e;
+
+  /* Roles on light surfaces */
+  --vs-surface: var(--vs-paper);
+  --vs-surface-alt: var(--vs-stone-100);
+  --vs-text: var(--vs-graphite);
+  --vs-text-muted: var(--vs-stone-600);
+  --vs-border: var(--vs-stone-200);
+  --vs-link: var(--vs-blueprint-600);
+  --vs-link-hover: var(--vs-blueprint-500);
+  --vs-focus: var(--vs-blueprint-600);
+
+  /* Type */
+  --vs-font: 'Archivo', 'Segoe UI', Arial, sans-serif;
+  --vs-width-display: 125%;
+  --vs-width-subheading: 112%;
+  --vs-width-text: 100%;
+  --vs-text-xs: 0.8rem;
+  --vs-text-sm: 0.9rem;
+  --vs-text-base: 1rem;
+  --vs-text-md: 1.25rem;
+  --vs-text-lg: 1.5625rem;
+  --vs-text-xl: 2.4375rem;
+  --vs-text-2xl: 3.8125rem;
+  --vs-text-display: clamp(3.5rem, 9vw, 9rem);
+
+  /* Logo: clear space is the doorway's height, about 14% of the mark's height */
+  --vs-logo-min-width: 120px;
+  --vs-mark-min-height: 40px;
+  --vs-mark-clear-space-ratio: 0.14;
+}
+
+/* Roles on dark surfaces: add this class to a Graphite section. */
+.vs-on-dark {
+  --vs-surface: var(--vs-graphite);
+  --vs-surface-alt: var(--vs-stone-800);
+  --vs-text: var(--vs-paper);
+  --vs-text-muted: var(--vs-stone-300);
+  --vs-border: var(--vs-stone-700);
+  --vs-link: var(--vs-blueprint-300);
+  --vs-link-hover: var(--vs-blueprint-100);
+  --vs-focus: var(--vs-blueprint-300);
+}

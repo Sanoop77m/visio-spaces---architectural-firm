@@ -233,7 +233,7 @@ export function createSiteScene(canvas, { reducedMotion, onSun }) {
 
     // Keep the subject clear of the text: sideways when wide, upward on phones.
     const shiftX = isWide ? mix('shift') : 0;
-    const shiftY = isWide ? (u < 1 ? (1 - u) * 0.14 : 0) : 0.16;
+    const shiftY = isWide ? (u < 1 ? (1 - u) * 0.2 : 0) : 0.16;
     camera.setViewOffset(width, height, -shiftX * width, shiftY * height, width, height);
 
     const sunElevation = mix('sunElevation');
