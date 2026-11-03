@@ -5,8 +5,8 @@
 export const TIMELINE = [
   {
     stop: 'hero',
-    camera: [-32, 4.5, 44],
-    target: [3, 6.5, 0],
+    camera: [-46, 6, 64],
+    target: [0, 6, 0],
     shift: 0,
     minutes: 8 * 60,
     sunElevation: 18,
@@ -22,8 +22,8 @@ export const TIMELINE = [
   },
   {
     stop: 'studio',
-    camera: [-25, 2.2, 21],
-    target: [7, 4.2, 0],
+    camera: [-38, 3, 44],
+    target: [6, 4.5, 0],
     shift: -0.16,
     minutes: 9 * 60 + 20,
     sunElevation: 30,
@@ -39,8 +39,8 @@ export const TIMELINE = [
   },
   {
     stop: 'house',
-    camera: [31, 7, 31],
-    target: [1, 4.2, 0],
+    camera: [46, 10, 46],
+    target: [0, 4.5, 2],
     shift: 0.16,
     minutes: 10 * 60 + 40,
     sunElevation: 42,

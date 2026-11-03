@@ -1,5 +1,11 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+// The firm's own SketchUp model of the Courtyard House, cleaned and simplified
+// in Blender. Its materials are named after the classes below.
+const HOUSE_MODEL = new URL('../assets/courtyard-house.glb', import.meta.url).href;
 
 const TEXTURE_METRES = 5;
 
@@ -89,6 +95,21 @@ export function createMaterials() {
       emissiveIntensity: 0,
     }),
     water: new THREE.MeshStandardMaterial({ color: '#7fa6ba', roughness: 0.15, metalness: 0.1 }),
+    // Untextured: the house model has no UVs, and flat colour suits it.
+    // Double-sided because SketchUp exports faces with mixed winding.
+    plaster: new THREE.MeshStandardMaterial({ color: '#efebe4', roughness: 0.9, side: THREE.DoubleSide }),
+    grey: new THREE.MeshStandardMaterial({ color: '#9a9792', roughness: 0.85, side: THREE.DoubleSide }),
+    dark: new THREE.MeshStandardMaterial({ color: '#3a3836', roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
+    timber: new THREE.MeshStandardMaterial({ color: '#7a5638', roughness: 0.75, side: THREE.DoubleSide }),
+    paving: new THREE.MeshStandardMaterial({ color: '#cbc5ba', roughness: 0.95, side: THREE.DoubleSide }),
+    houseGlass: new THREE.MeshStandardMaterial({
+      side: THREE.DoubleSide,
+      color: '#5d7480',
+      roughness: 0.2,
+      metalness: 0.2,
+      emissive: '#ffb066',
+      emissiveIntensity: 0,
+    }),
   };
 }
 
@@ -113,21 +134,13 @@ function boxGeometry(w, h, d) {
   return geometry;
 }
 
-function createBuilder(parent, materials, edges) {
-  parent.updateMatrixWorld(true);
-
+function createBuilder(parent, materials) {
   const add = (geometry, material, x, y, z) => {
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     mesh.castShadow = material !== materials.water;
     mesh.receiveShadow = true;
     parent.add(mesh);
-    if (edges) {
-      mesh.updateMatrixWorld(true);
-      const outline = new THREE.EdgesGeometry(geometry, 25).applyMatrix4(mesh.matrixWorld);
-      edges.push(...outline.attributes.position.array);
-      outline.dispose();
-    }
     return mesh;
   };
 
@@ -138,35 +151,31 @@ function createBuilder(parent, materials, edges) {
   return { add, box };
 }
 
-function buildHouse(group, materials, edges) {
-  const { box } = createBuilder(group, materials, edges);
-  const { concrete, darkConcrete, glass, glassLate, bronze, water } = materials;
-
-  box(36, 0.4, 24, 0, 0, 1, darkConcrete);
-
-  // Ground floor
-  box(24, 3.2, 0.4, 0, 0.4, -8);
-  box(0.4, 3.2, 14, -12, 0.4, -1);
-  box(18, 3, 0.2, 1, 0.5, 5.6, glass);
-  box(0.2, 3, 7, 11, 0.5, 2, glass);
-  box(0.35, 3.2, 0.35, -8, 0.4, 5.6, bronze);
-  box(0.35, 3.2, 0.35, 11, 0.4, 5.6, bronze);
-
-  // First-floor slab and the bar that leans out over the garden
-  box(27, 0.4, 16, -0.5, 3.6, -1);
-  box(19, 3.3, 9, 7, 4, -1);
-  box(16, 1.5, 0.25, 7, 5, 3.55, glassLate);
-  box(0.25, 1.5, 6, 16.55, 5, -1, glass);
-  box(21, 0.35, 11, 7, 7.3, -1);
-
-  // Shade fins across the ribbon window
-  for (let i = 0; i < 9; i++) box(0.14, 2.6, 0.7, -0.5 + i * 1.9, 4.35, 4.1, bronze);
-
-  // Garden walls, steps and pool
-  box(14, 2.4, 0.4, -8, 0.4, 12.5);
-  box(0.4, 1.4, 10, -16, 0.4, 7);
-  for (let i = 0; i < 4; i++) box(4, 0.1 + i * 0.1, 0.6, 14, 0, 13.4 - i * 0.6, darkConcrete);
-  box(12, 0.06, 4.5, 3, 0.4, 9.2, water);
+// Resolves with the model's outline, for the opening sketch.
+async function loadHouse(group, materials) {
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  const gltf = await loader.loadAsync(HOUSE_MODEL);
+  const byName = { ...materials, glass: materials.houseGlass };
+  const outlines = [];
+  gltf.scene.updateMatrixWorld(true);
+  gltf.scene.traverse((object) => {
+    if (!object.isMesh) return;
+    const name = object.material.name;
+    object.material.dispose();
+    object.material = byName[name] ?? materials.plaster;
+    object.castShadow = object.material !== materials.water && object.material !== materials.houseGlass;
+    object.receiveShadow = true;
+    const outline = new THREE.EdgesGeometry(object.geometry, 25).applyMatrix4(object.matrixWorld);
+    outlines.push(outline.attributes.position.array);
+    outline.dispose();
+  });
+  group.add(gltf.scene);
+  const edges = new Float32Array(outlines.reduce((total, array) => total + array.length, 0));
+  outlines.reduce((offset, array) => {
+    edges.set(array, offset);
+    return offset + array.length;
+  }, 0);
+  return edges;
 }
 
 function buildLibrary(group, materials) {
@@ -253,8 +262,9 @@ function buildPavilion(group, materials) {
 }
 
 // Metres. Each model faces +z so the camera stops read from the south.
+// The house has no `build`: it is loaded from a file by createBuildings.
 export const SITES = [
-  { position: [0, 0, 0], radius: 26, build: buildHouse },
+  { position: [0, 0, 0], radius: 30 },
   { position: [76, 0, -36], radius: 34, build: buildLibrary },
   { position: [30, 0, -108], radius: 26, build: buildOffices },
   { position: [-52, 0, -90], radius: 24, build: buildPavilion },
@@ -284,14 +294,19 @@ function mergeByMaterial(group, materials) {
   });
 }
 
+// `house` resolves with the house's outline once its model has loaded.
 export function createBuildings(scene, materials) {
-  const heroEdges = [];
-  SITES.forEach((site, index) => {
+  let house;
+  SITES.forEach((site) => {
     const group = new THREE.Group();
     group.position.set(...site.position);
     scene.add(group);
-    site.build(group, materials, index === 0 ? heroEdges : undefined);
+    if (!site.build) {
+      house = loadHouse(group, materials);
+      return;
+    }
+    site.build(group, materials);
     mergeByMaterial(group, materials);
   });
-  return { heroEdges };
+  return { house };
 }

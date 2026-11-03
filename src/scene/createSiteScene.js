@@ -128,28 +128,44 @@ export function createSiteScene(canvas, { reducedMotion, onSun }) {
 
   // Site
   const materials = createMaterials();
-  const { heroEdges } = createBuildings(scene, materials);
+  const { house } = createBuildings(scene, materials);
   createLandscape(scene, cameraCurve.getPoints(120));
 
-  // Intro: the house is sketched as lines, then fills in.
-  const fadingMaterials = [materials.concrete, materials.darkConcrete, materials.bronze, materials.glass, materials.glassLate, materials.water];
+  // Intro: the house is sketched as lines, then fills in. It waits for the
+  // house model, and the site stays hidden until then.
+  const fadingMaterials = Object.values(materials);
   const sketchMaterial = new THREE.LineBasicMaterial({ color: '#1f4fa3', transparent: true, opacity: 0.95, fog: false });
-  const sketchGeometry = new THREE.BufferGeometry().setAttribute(
-    'position',
-    new THREE.Float32BufferAttribute(heroEdges, 3),
-  );
+  const sketchGeometry = new THREE.BufferGeometry();
   const sketch = new THREE.LineSegments(sketchGeometry, sketchMaterial);
+  sketch.visible = false;
   scene.add(sketch);
-  const sketchVertexCount = heroEdges.length / 3;
-  let introRunning = !reducedMotion;
-  if (introRunning) {
+  let sketchVertexCount = 0;
+  let introWaiting = !reducedMotion;
+  let introRunning = false;
+  if (introWaiting) {
     fadingMaterials.forEach((material) => {
       material.transparent = true;
       material.opacity = 0;
     });
-  } else {
-    sketch.visible = false;
   }
+  let disposed = false;
+  house
+    .then((edges) => {
+      if (disposed || !introWaiting) return;
+      sketchGeometry.setAttribute('position', new THREE.BufferAttribute(edges, 3));
+      sketchVertexCount = edges.length / 3;
+      sketch.visible = true;
+      introRunning = true;
+    })
+    .catch((error) => {
+      console.warn('House model unavailable', error);
+      // Show the rest of the site without the intro.
+      if (introWaiting) updateIntro(INTRO.linesEnd);
+    })
+    .finally(() => {
+      introWaiting = false;
+      dirty = true;
+    });
 
   let width = 1;
   let height = 1;
@@ -259,6 +275,7 @@ export function createSiteScene(canvas, { reducedMotion, onSun }) {
     materials.glass.emissiveIntensity = glow;
     materials.glassLate.emissiveIntensity = glow * 0.7;
     materials.slit.emissiveIntensity = glow;
+    materials.houseGlass.emissiveIntensity = glow * glow * 0.6;
 
     sky.position.copy(camera.position);
 
@@ -363,6 +380,7 @@ export function createSiteScene(canvas, { reducedMotion, onSun }) {
       dirty = true;
     },
     dispose() {
+      disposed = true;
       cancelAnimationFrame(frame);
       window.removeEventListener('resize', resize);
       window.removeEventListener('pointermove', onPointerMove);
