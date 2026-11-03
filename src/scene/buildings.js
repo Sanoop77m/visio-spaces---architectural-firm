@@ -65,6 +65,77 @@ function createWindowTexture(seed) {
   return texture;
 }
 
+// Finishes for the house model, drawn near-white so the material colour tints
+// them. `metres` is how much wall one copy of the texture covers.
+function createFinishTexture(kind, metres) {
+  const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const random = seededRandom(kind.length * 97);
+  const grey = (value, alpha = 1) => `rgba(${value},${value},${value},${alpha})`;
+  ctx.fillStyle = grey(236);
+  ctx.fillRect(0, 0, size, size);
+
+  if (kind === 'plaster') {
+    // Trowelled render: soft clouds, then fine grit.
+    for (let i = 0; i < 260; i++) {
+      ctx.fillStyle = grey(random() > 0.5 ? 255 : 224, 0.035);
+      ctx.beginPath();
+      ctx.arc(random() * size, random() * size, 20 + random() * 70, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (kind === 'timber') {
+    // Vertical boards with grain and dark joints.
+    const boards = 12;
+    const width = size / boards;
+    for (let i = 0; i < boards; i++) {
+      ctx.fillStyle = grey(200 + random() * 50);
+      ctx.fillRect(i * width, 0, width, size);
+      for (let j = 0; j < 7; j++) {
+        ctx.strokeStyle = grey(150, 0.25);
+        ctx.lineWidth = 0.6 + random();
+        ctx.beginPath();
+        const x = i * width + random() * width;
+        ctx.moveTo(x, 0);
+        for (let y = 0; y <= size; y += 32) ctx.lineTo(x + Math.sin(y / 60 + i + j) * 2, y);
+        ctx.stroke();
+      }
+      ctx.fillStyle = grey(70);
+      ctx.fillRect(i * width, 0, 2, size);
+    }
+  } else if (kind === 'metal') {
+    // Cladding panels with fine vertical brushing.
+    for (let i = 0; i < 400; i++) {
+      ctx.fillStyle = grey(random() > 0.5 ? 255 : 190, 0.08);
+      ctx.fillRect(random() * size, 0, 1, size);
+    }
+    ctx.fillStyle = grey(120);
+    for (let i = 0; i < 4; i++) ctx.fillRect((i * size) / 4, 0, 3, size);
+  } else if (kind === 'paving') {
+    // Stone slabs with grout.
+    const slabs = 4;
+    const slab = size / slabs;
+    for (let i = 0; i < slabs; i++) {
+      for (let j = 0; j < slabs; j++) {
+        ctx.fillStyle = grey(212 + random() * 36);
+        ctx.fillRect(i * slab + 2, j * slab + 2, slab - 4, slab - 4);
+      }
+    }
+  }
+  for (let i = 0; i < 9000; i++) {
+    ctx.fillStyle = grey(random() > 0.5 ? 255 : 140, random() * 0.08);
+    ctx.fillRect(random() * size, random() * size, 1 + random() * 1.5, 1 + random() * 1.5);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.setScalar(1 / metres);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  return texture;
+}
+
 export function createMaterials() {
   const concreteMap = createConcreteTexture();
   const concrete = (color) =>
@@ -83,6 +154,18 @@ export function createMaterials() {
       emissiveIntensity: 0,
     });
 
+  const finish = (color, kind, metres, options) => {
+    const map = createFinishTexture(kind, metres);
+    return new THREE.MeshStandardMaterial({
+      color,
+      map,
+      bumpMap: map,
+      bumpScale: 0.6,
+      side: THREE.DoubleSide,
+      ...options,
+    });
+  };
+
   return {
     concrete: concrete('#f0ebe2'),
     darkConcrete: concrete('#8d8a88'),
@@ -95,13 +178,15 @@ export function createMaterials() {
       emissiveIntensity: 0,
     }),
     water: new THREE.MeshStandardMaterial({ color: '#7fa6ba', roughness: 0.15, metalness: 0.1 }),
-    // Untextured: the house model has no UVs, and flat colour suits it.
-    // Double-sided because SketchUp exports faces with mixed winding.
-    plaster: new THREE.MeshStandardMaterial({ color: '#efebe4', roughness: 0.9, side: THREE.DoubleSide }),
-    grey: new THREE.MeshStandardMaterial({ color: '#9a9792', roughness: 0.85, side: THREE.DoubleSide }),
-    dark: new THREE.MeshStandardMaterial({ color: '#3a3836', roughness: 0.6, metalness: 0.3, side: THREE.DoubleSide }),
-    timber: new THREE.MeshStandardMaterial({ color: '#7a5638', roughness: 0.75, side: THREE.DoubleSide }),
-    paving: new THREE.MeshStandardMaterial({ color: '#cbc5ba', roughness: 0.95, side: THREE.DoubleSide }),
+    // House model finishes. Double-sided because SketchUp exports faces with
+    // mixed winding. The textures double as bump maps for joints and grain.
+    plaster: finish('#f6f2eb', 'plaster', 3, { roughness: 0.9, bumpScale: 0.25 }),
+    grey: finish('#a29f99', 'plaster', 3, { roughness: 0.85, bumpScale: 0.25 }),
+    dark: finish('#45423f', 'metal', 2.4, { roughness: 0.55, metalness: 0.35 }),
+    timber: finish('#9a6a42', 'timber', 2.4, { roughness: 0.7 }),
+    paving: finish('#d6d0c4', 'paving', 2.4, { roughness: 0.95 }),
+    foliage: new THREE.MeshStandardMaterial({ color: '#3d6a33', roughness: 0.8, side: THREE.DoubleSide }),
+    foliageLight: new THREE.MeshStandardMaterial({ color: '#7d9d55', roughness: 0.8, side: THREE.DoubleSide }),
     houseGlass: new THREE.MeshStandardMaterial({
       side: THREE.DoubleSide,
       color: '#5d7480',
@@ -151,6 +236,28 @@ function createBuilder(parent, materials) {
   return { add, box };
 }
 
+// The model has no texture coordinates, so each face takes its texture from
+// the side it faces most, in metres: walls from the front or side, floors and
+// roofs from above. Vertices are split per face, so each has one normal.
+function addBoxUVs(mesh) {
+  const { position, normal } = mesh.geometry.attributes;
+  const normalMatrix = new THREE.Matrix3().getNormalMatrix(mesh.matrixWorld);
+  const point = new THREE.Vector3();
+  const facing = new THREE.Vector3();
+  const uv = new Float32Array(position.count * 2);
+  for (let i = 0; i < position.count; i++) {
+    point.fromBufferAttribute(position, i).applyMatrix4(mesh.matrixWorld);
+    facing.fromBufferAttribute(normal, i).applyMatrix3(normalMatrix);
+    const x = Math.abs(facing.x);
+    const y = Math.abs(facing.y);
+    const z = Math.abs(facing.z);
+    if (y >= x && y >= z) uv.set([point.x, point.z], i * 2);
+    else if (x >= z) uv.set([point.z, point.y], i * 2);
+    else uv.set([point.x, point.y], i * 2);
+  }
+  mesh.geometry.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
+
 // Resolves with the model's outline, for the opening sketch.
 async function loadHouse(group, materials) {
   const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
@@ -163,8 +270,11 @@ async function loadHouse(group, materials) {
     const name = object.material.name;
     object.material.dispose();
     object.material = byName[name] ?? materials.plaster;
+    if (object.material.map) addBoxUVs(object);
     object.castShadow = object.material !== materials.water && object.material !== materials.houseGlass;
     object.receiveShadow = true;
+    // Leaves would turn the sketch into scribble.
+    if (name.startsWith('foliage')) return;
     const outline = new THREE.EdgesGeometry(object.geometry, 25).applyMatrix4(object.matrixWorld);
     outlines.push(outline.attributes.position.array);
     outline.dispose();
